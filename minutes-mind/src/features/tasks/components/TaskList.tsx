@@ -14,13 +14,13 @@ import type { TaskResponse, TaskStatus } from '../../../types/api'
 
 const LABELS = {
   title: 'Tasks',
-  add: 'Th\u00eam task',
-  loading: '\u0110ang t\u1ea3i tasks...',
-  empty: 'Ch\u01b0a c\u00f3 task n\u00e0o cho goal n\u00e0y.',
-  emptyFiltered: 'Kh\u00f4ng c\u00f3 task n\u00e0o kh\u1edbp filter.',
-  noGoal: 'Ch\u1ecdn m\u1ed9t goal \u0111\u1ec3 xem tasks.',
-  modalTitleCreate: 'T\u1ea1o task m\u1edbi',
-  modalTitleEdit: 'S\u1eeda task',
+  add: 'Thêm task',
+  loading: 'Đang tải tasks...',
+  empty: 'Chưa có task nào cho goal này.',
+  emptyFiltered: 'Không có task nào khớp filter.',
+  noGoal: 'Chọn một goal để xem tasks.',
+  modalTitleCreate: 'Tạo task mới',
+  modalTitleEdit: 'Sửa task',
 } as const
 
 const FILTERS: Array<'ALL' | TaskStatus> = ['ALL', 'TODO', 'IN_PROGRESS', 'DONE']
@@ -33,7 +33,7 @@ export function TaskList({ goalId }: TaskListProps) {
   const [filter, setFilter] = useState<'ALL' | TaskStatus>('ALL')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<TaskResponse | null>(null)
-  
+
   const tasksQuery = useTasks(goalId)
   const createTask = useCreateTask()
   const updateTask = useUpdateTask()
@@ -49,8 +49,9 @@ export function TaskList({ goalId }: TaskListProps) {
 
   if (goalId === null) {
     return (
-      <div className="rounded-xl border border-border bg-surface p-4 text-sm text-text-muted">
-        {LABELS.noGoal}
+      <div className="rounded-2xl border border-border bg-surface p-6 text-center">
+        <div className="text-3xl opacity-30 mb-2">📋</div>
+        <p className="text-sm text-text-muted">{LABELS.noGoal}</p>
       </div>
     )
   }
@@ -61,7 +62,7 @@ export function TaskList({ goalId }: TaskListProps) {
   }
 
   const handleDelete = (id: number) => {
-    if (window.confirm('B\u1ea1n c\u00f3 ch\u1eafc ch\u1eafn mu\u1ed1n x\u00f3a task n\u00e0y?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa task này?')) {
       deleteTask.mutate({ id, goalId })
     }
   }
@@ -72,63 +73,75 @@ export function TaskList({ goalId }: TaskListProps) {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-text-primary">{LABELS.title}</h3>
-        <div className="flex flex-wrap gap-1">
-          {FILTERS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setFilter(value)}
-              className={`rounded-lg px-2.5 py-1 text-xs transition ${
-                filter === value ? 'bg-brand text-white' : 'bg-surface-2 text-text-muted hover:text-text-primary'
-              }`}
-            >
-              {value}
-            </button>
-          ))}
+    <div>
+      {/* Header */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h3 className="text-base font-semibold text-text-primary">{LABELS.title}</h3>
+          {/* Filter pills */}
+          <div className="flex gap-1">
+            {FILTERS.map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setFilter(value)}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-150 ${
+                  filter === value
+                    ? 'bg-brand text-white shadow-sm shadow-brand/30'
+                    : 'bg-surface-2 text-text-muted hover:text-text-primary hover:bg-border'
+                }`}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
         </div>
         <button
           type="button"
-          onClick={() => {
-            setEditingTask(null)
-            setModalOpen(true)
-          }}
-          className="inline-flex items-center gap-1 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white transition hover:bg-brand-dark"
+          onClick={() => { setEditingTask(null); setModalOpen(true) }}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-3 py-1.5 text-sm font-medium text-white transition-all hover:bg-brand-dark active:scale-95"
         >
-          <Plus size={16} />
+          <Plus size={14} />
           {LABELS.add}
         </button>
       </div>
 
-      {tasksQuery.isLoading ? (
-        <p className="text-sm text-text-muted">{LABELS.loading}</p>
-      ) : null}
+      {/* Task container */}
+      <div className="rounded-2xl border border-border bg-surface p-4">
+        {tasksQuery.isLoading ? (
+          <p className="text-sm text-text-muted">{LABELS.loading}</p>
+        ) : null}
 
-      {!tasksQuery.isLoading && tasks.length === 0 ? (
-        <p className="text-sm text-text-muted">{LABELS.empty}</p>
-      ) : null}
+        {!tasksQuery.isLoading && tasks.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-10 text-center">
+            <div className="text-3xl opacity-30">📋</div>
+            <p className="text-sm text-text-muted">{LABELS.empty}</p>
+          </div>
+        ) : null}
 
-      {!tasksQuery.isLoading && tasks.length > 0 && filteredTasks.length === 0 ? (
-        <p className="text-sm text-text-muted">{LABELS.emptyFiltered}</p>
-      ) : null}
+        {!tasksQuery.isLoading && tasks.length > 0 && filteredTasks.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-10 text-center">
+            <div className="text-3xl opacity-30">🔍</div>
+            <p className="text-sm text-text-muted">{LABELS.emptyFiltered}</p>
+          </div>
+        ) : null}
 
-      <div className="space-y-2">
-        {filteredTasks.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            onStatusChange={(id, status) => updateStatus.mutate({ id, goalId, status })}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
+        <div className="divide-y divide-border/40">
+          {filteredTasks.map((task) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              onStatusChange={(id, status) => updateStatus.mutate({ id, goalId, status })}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
       </div>
 
-      <Modal 
-        isOpen={modalOpen} 
-        onClose={handleCloseModal} 
+      <Modal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
         title={editingTask ? LABELS.modalTitleEdit : LABELS.modalTitleCreate}
       >
         <TaskForm

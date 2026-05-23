@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { BarChart2, Clock, ListTodo, LogOut, UserCircle2, Users } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 
@@ -15,7 +16,10 @@ const NAV_LABELS = {
 } as const
 
 const navItemClass = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${isActive ? 'bg-surface-2 text-text-primary' : 'text-text-muted hover:text-text-primary'
+  `flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-150 ${
+    isActive
+      ? 'bg-brand/10 text-brand border border-brand/20'
+      : 'text-text-muted hover:text-text-primary hover:bg-surface-2 border border-transparent'
   }`
 
 export function AppShell() {
@@ -24,9 +28,27 @@ export function AppShell() {
   const { data: invitations = [] } = useMyInvitations()
   const pendingInvites = invitations.filter((i) => i.status === 'PENDING').length
 
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', onFsChange)
+    return () => document.removeEventListener('fullscreenchange', onFsChange)
+  }, [])
+
   return (
     <div className="flex h-screen bg-background text-text-primary">
-      <aside className="hidden w-60 flex-col border-r border-border bg-surface md:flex">
+      {/* Desktop sidebar — hidden when fullscreen */}
+      <aside
+        className="hidden w-60 flex-col border-r border-border bg-surface md:flex overflow-hidden"
+        style={{
+          width: isFullscreen ? 0 : undefined,
+          minWidth: isFullscreen ? 0 : undefined,
+          opacity: isFullscreen ? 0 : 1,
+          pointerEvents: isFullscreen ? 'none' : 'auto',
+          transition: 'width 0.25s ease, opacity 0.2s ease',
+        }}
+      >
         <div className="flex items-center justify-between border-b border-border px-4 py-4">
           <span className="text-lg font-semibold text-brand">Vilo</span>
           {user ? <span className="text-xs text-text-muted">{user.name}</span> : null}
@@ -75,7 +97,16 @@ export function AppShell() {
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-border bg-surface px-4 py-2 md:hidden">
+      {/* Mobile bottom nav — hidden when fullscreen */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-border bg-surface px-4 py-2 md:hidden"
+        style={{
+          transform: isFullscreen ? 'translateY(100%)' : 'translateY(0)',
+          opacity: isFullscreen ? 0 : 1,
+          pointerEvents: isFullscreen ? 'none' : 'auto',
+          transition: 'transform 0.25s ease, opacity 0.2s ease',
+        }}
+      >
         <NavLink to="/app/timer" className={navItemClass}>
           <Clock size={18} />
         </NavLink>

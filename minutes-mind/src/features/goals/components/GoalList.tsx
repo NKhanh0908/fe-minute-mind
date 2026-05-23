@@ -12,11 +12,10 @@ import { GoalForm } from './GoalForm'
 
 const LABELS = {
   title: 'Goals',
-  add: 'Th\u00eam Goal',
-  loading: '\u0110ang t\u1ea3i goals...',
-  empty: 'Ch\u01b0a c\u00f3 goal n\u00e0o. T\u1ea1o goal \u0111\u1ea7u ti\u00ean \u0111\u1ec3 b\u1eaft \u0111\u1ea7u tracking.',
-  modalTitle: 'T\u1ea1o goal m\u1edbi',
-  errorFallback: 'Kh\u00f4ng t\u1ea3i \u0111\u01b0\u1ee3c danh s\u00e1ch goals.',
+  add: 'Thêm Goal',
+  loading: 'Đang tải goals...',
+  modalTitle: 'Tạo goal mới',
+  errorFallback: 'Không tải được danh sách goals.',
 } as const
 
 interface GoalListProps {
@@ -40,7 +39,7 @@ export function GoalList({ selectedGoalId, onSelectGoal }: GoalListProps) {
   }
 
   const handleDelete = (id: number) => {
-    if (window.confirm('B\u1ea1n c\u00f3 ch\u1eafc ch\u1eafn mu\u1ed1n x\u00f3a Goal n\u00e0y kh\u00f4ng? To\u00e0n b\u1ed9 Task s\u1ebd b\u1ecb x\u00f3a theo.')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa Goal này không? Toàn bộ Task sẽ bị xóa theo.')) {
       deleteGoal.mutate(id)
     }
   }
@@ -51,18 +50,21 @@ export function GoalList({ selectedGoalId, onSelectGoal }: GoalListProps) {
   }
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-text-primary">{LABELS.title}</h2>
+    <section className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h2 className="text-lg font-semibold text-text-primary">{LABELS.title}</h2>
+          <p className="text-xs text-text-muted mt-0.5">
+            {goals.length} goal{goals.length !== 1 ? 's' : ''}
+          </p>
+        </div>
         <button
           type="button"
-          className="inline-flex items-center gap-1 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
-          onClick={() => {
-            setEditingGoal(null)
-            setModalOpen(true)
-          }}
+          onClick={() => { setEditingGoal(null); setModalOpen(true) }}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white transition-all hover:bg-brand-dark hover:shadow-lg hover:shadow-brand/20 active:scale-95"
         >
-          <Plus size={16} /> {/* Thư viện Icon */}
+          <Plus size={15} />
           {LABELS.add}
         </button>
       </div>
@@ -77,10 +79,22 @@ export function GoalList({ selectedGoalId, onSelectGoal }: GoalListProps) {
         </p>
       ) : null}
 
+      {/* Empty state */}
       {!goalsQuery.isLoading && goals.length === 0 ? (
-        <p className="rounded-xl border border-border bg-surface p-4 text-sm text-text-muted">
-          {LABELS.empty}
-        </p>
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-surface p-12 text-center">
+          <div className="text-5xl opacity-30">🎯</div>
+          <div>
+            <h3 className="text-base font-semibold text-text-primary">Chưa có goal nào</h3>
+            <p className="mt-1 text-sm text-text-muted">Tạo goal đầu tiên để bắt đầu theo dõi tiến độ</p>
+          </div>
+          <button
+            onClick={() => { setEditingGoal(null); setModalOpen(true) }}
+            className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-dark transition-all active:scale-95"
+          >
+            <Plus size={16} />
+            Tạo goal đầu tiên
+          </button>
+        </div>
       ) : null}
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -96,10 +110,10 @@ export function GoalList({ selectedGoalId, onSelectGoal }: GoalListProps) {
         ))}
       </div>
 
-      <Modal 
-        isOpen={modalOpen} 
-        onClose={handleCloseModal} 
-        title={editingGoal ? 'S\u1eeda Goal' : LABELS.modalTitle}
+      <Modal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        title={editingGoal ? 'Sửa Goal' : LABELS.modalTitle}
       >
         <GoalForm
           defaultValues={editingGoal ?? undefined}

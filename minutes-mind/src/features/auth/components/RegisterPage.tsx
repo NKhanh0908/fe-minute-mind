@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -6,18 +6,18 @@ import { useRegister } from '../hooks/useRegister'
 
 const LABELS = {
   title: 'Vilo',
-  subtitle: 'T\u1ea1o t\u00e0i kho\u1ea3n m\u1edbi',
-  namePlaceholder: 'H\u1ecd t\u00ean',
+  subtitle: 'Tạo tài khoản mới',
+  namePlaceholder: 'Họ tên',
   emailPlaceholder: 'Email',
-  passwordPlaceholder: 'M\u1eadt kh\u1ea9u (\u2265 8 k\u00fd t\u1ef1)',
-  submit: '\u0110\u0103ng k\u00fd',
-  submitting: '\u0110ang \u0111\u0103ng k\u00fd...',
-  haveAccount: '\u0110\u00e3 c\u00f3 t\u00e0i kho\u1ea3n? ',
-  loginLink: '\u0110\u0103ng nh\u1eadp',
-  errorFallback: '\u0110\u0103ng k\u00fd th\u1ea5t b\u1ea1i, vui l\u00f2ng th\u1eed l\u1ea1i.',
-  emailInvalid: 'Email kh\u00f4ng h\u1ee3p l\u1ec7',
-  passwordTooShort: 'M\u1eadt kh\u1ea9u c\u1ea7n t\u1ed1i thi\u1ec3u 8 k\u00fd t\u1ef1',
-  nameRequired: 'Vui l\u00f2ng nh\u1eadp h\u1ecd t\u00ean',
+  passwordPlaceholder: 'Mật khẩu (≥ 8 ký tự)',
+  submit: 'Đăng ký',
+  submitting: 'Đang đăng ký...',
+  haveAccount: 'Đã có tài khoản? ',
+  loginLink: 'Đăng nhập',
+  errorFallback: 'Đăng ký thất bại, vui lòng thử lại.',
+  emailInvalid: 'Email không hợp lệ',
+  passwordTooShort: 'Mật khẩu cần tối thiểu 8 ký tự',
+  nameRequired: 'Vui lòng nhập họ tên',
 } as const
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -41,64 +41,63 @@ export function RegisterPage() {
     registerMutation.mutate({ name: name.trim(), email: email.trim(), password })
   }
 
+  const inputClass = 'w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-brand focus:outline-none hover:border-border/70'
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-6">
-        <h1 className="mb-1 text-center text-2xl font-bold text-brand">{LABELS.title}</h1>
-        <p className="mb-6 text-center text-sm text-text-muted">{LABELS.subtitle}</p>
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 70%)' }}
+      />
 
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <input
-            className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
-            type="text"
-            placeholder={LABELS.namePlaceholder}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-            autoComplete="name"
-          />
-          <input
-            className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
-            type="email"
-            placeholder={LABELS.emailPlaceholder}
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            autoComplete="email"
-          />
-          <input
-            className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
-            type="password"
-            placeholder={LABELS.passwordPlaceholder}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            minLength={8}
-            autoComplete="new-password"
-          />
+      <div className="relative w-full max-w-sm">
+        <div
+          className="rounded-2xl border border-border bg-surface p-8"
+          style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.03), 0 20px 60px rgba(0,0,0,0.4)' }}
+        >
+          {/* Logo + heading */}
+          <div className="mb-8 text-center">
+            <div
+              className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', boxShadow: '0 4px 16px rgba(99,102,241,0.35)' }}
+            >
+              <span className="text-xl font-bold text-white">V</span>
+            </div>
+            <h1 className="text-2xl font-bold text-text-primary">{LABELS.title}</h1>
+            <p className="mt-1 text-sm text-text-muted">{LABELS.subtitle}</p>
+          </div>
 
-          <button
-            className="flex w-full items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
-            type="submit"
-            disabled={registerMutation.isPending || Boolean(validationError)}
-          >
-            {registerMutation.isPending ? LABELS.submitting : LABELS.submit}
-          </button>
+          <form className="space-y-3" onSubmit={onSubmit}>
+            <input className={inputClass} type="text" placeholder={LABELS.namePlaceholder} value={name}
+              onChange={(e) => setName(e.target.value)} required autoComplete="name" />
+            <input className={inputClass} type="email" placeholder={LABELS.emailPlaceholder} value={email}
+              onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+            <input className={inputClass} type="password" placeholder={LABELS.passwordPlaceholder} value={password}
+              onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
 
-          {validationError ? (
-            <p className="text-sm text-status-danger">{validationError}</p>
-          ) : null}
-          {registerMutation.isError && !validationError ? (
-            <p className="text-sm text-status-danger">{LABELS.errorFallback}</p>
-          ) : null}
-        </form>
+            {(validationError || (registerMutation.isError && !validationError)) && (
+              <p className="rounded-lg bg-red-950/50 px-3 py-2 text-sm text-status-danger border border-red-900/40">
+                {validationError ?? LABELS.errorFallback}
+              </p>
+            )}
 
-        <p className="mt-6 text-center text-sm text-text-muted">
-          {LABELS.haveAccount}
-          <Link className="text-brand hover:text-brand-dark" to="/login">
-            {LABELS.loginLink}
-          </Link>
-        </p>
+            <button
+              className="flex w-full items-center justify-center rounded-xl py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', boxShadow: '0 4px 16px rgba(99,102,241,0.3)', marginTop: 8 }}
+              type="submit"
+              disabled={registerMutation.isPending || Boolean(validationError)}
+            >
+              {registerMutation.isPending ? LABELS.submitting : LABELS.submit}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-text-muted">
+            {LABELS.haveAccount}
+            <Link className="font-medium text-brand hover:text-brand-dark transition-colors" to="/login">
+              {LABELS.loginLink}
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

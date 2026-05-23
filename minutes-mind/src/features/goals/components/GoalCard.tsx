@@ -10,10 +10,10 @@ interface GoalCardProps {
 }
 
 const STATUS_CLASS: Record<GoalResponse['status'], string> = {
-  ACTIVE: 'bg-blue-950 text-blue-400',
-  PAUSED: 'bg-amber-950 text-amber-400',
+  ACTIVE:    'bg-blue-950 text-blue-400',
+  PAUSED:    'bg-amber-950 text-amber-400',
   COMPLETED: 'bg-green-950 text-green-400',
-  ARCHIVED: 'bg-zinc-800 text-zinc-400',
+  ARCHIVED:  'bg-zinc-800 text-zinc-400',
 }
 
 export function GoalCard({ goal, selected = false, onSelect, onEdit, onDelete }: GoalCardProps) {
@@ -23,77 +23,82 @@ export function GoalCard({ goal, selected = false, onSelect, onEdit, onDelete }:
 
   return (
     <div
-      className={`group relative flex w-full flex-col rounded-xl border p-4 text-left transition ${
+      onClick={() => onSelect(goal.id)}
+      className={`group relative flex cursor-pointer flex-col rounded-2xl border p-4 transition-all duration-200 ${
         selected
-          ? 'border-brand bg-surface-2'
-          : 'border-border bg-surface hover:border-brand/40 hover:bg-surface-2'
+          ? 'border-brand bg-brand/5 shadow-lg shadow-brand/10'
+          : 'border-border bg-surface hover:border-border/80 hover:bg-surface-2'
       }`}
     >
-      <div 
-        className="absolute inset-0 cursor-pointer rounded-xl"
-        onClick={() => onSelect(goal.id)}
-        aria-hidden="true"
-      />
-      <div className="mb-2 flex items-start justify-between gap-3 relative z-10">
-        <div className="flex items-center gap-2">
+      {/* Header row */}
+      <div className="mb-3 flex items-start justify-between gap-2">
+        {/* Left: color dot + title */}
+        <div className="flex min-w-0 items-center gap-2.5">
           <span
-            className="h-4 w-1 rounded-full"
+            className="mt-0.5 h-3 w-3 shrink-0 rounded-full"
             style={{ backgroundColor: accent }}
-            aria-hidden
           />
-          <h4 className="text-sm font-semibold text-text-primary">{goal.title}</h4>
+          <h4 className="truncate text-sm font-semibold text-text-primary leading-tight">
+            {goal.title}
+          </h4>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wider ${STATUS_CLASS[goal.status]}`}>
+
+        {/* Right: status badge + action buttons — ALWAYS rendered, opacity trick */}
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${STATUS_CLASS[goal.status]}`}>
             {goal.status}
           </span>
-          <div className="hidden items-center gap-1 group-hover:flex">
-            {onEdit ? (
+          {/* Action buttons — opacity transition, NO layout shift */}
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none group-hover:pointer-events-auto">
+            {onEdit && (
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onEdit(goal)
-                }}
-                className="rounded-md p-1 text-text-muted transition-colors hover:bg-surface hover:text-brand"
+                onClick={(e) => { e.stopPropagation(); onEdit(goal) }}
+                className="rounded-lg p-1.5 text-text-muted hover:bg-surface hover:text-brand transition-colors"
                 title="Sửa"
               >
-                <Pencil size={14} />
+                <Pencil size={13} />
               </button>
-            ) : null}
-            {onDelete ? (
+            )}
+            {onDelete && (
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete(goal.id)
-                }}
-                className="rounded-md p-1 text-text-muted transition-colors hover:bg-surface hover:text-status-danger"
+                onClick={(e) => { e.stopPropagation(); onDelete(goal.id) }}
+                className="rounded-lg p-1.5 text-text-muted hover:bg-surface hover:text-status-danger transition-colors"
                 title="Xóa"
               >
-                <Trash2 size={14} />
+                <Trash2 size={13} />
               </button>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
-      {goal.description ? (
-        <p className="line-clamp-1 text-xs text-text-muted">{goal.description}</p>
-      ) : null}
+
+      {/* Description */}
+      {goal.description && (
+        <p className="mb-3 line-clamp-1 text-xs text-text-muted">{goal.description}</p>
+      )}
+
+      {/* Progress */}
       {target > 0 ? (
-        <>
-          <div className="mt-3 h-1.5 rounded-full bg-surface-2">
+        <div className="mt-auto space-y-1.5">
+          <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
             <div
-              className="h-full rounded-full transition-all"
+              className="h-full rounded-full transition-[width] duration-500 ease-out"
               style={{ width: `${progress}%`, backgroundColor: accent }}
             />
           </div>
-          <p className="mt-2 text-xs text-text-muted">
-            {goal.totalLoggedMinutes} / {target} min
-          </p>
-        </>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-text-muted">
+              {goal.totalLoggedMinutes} / {target} min
+            </span>
+            <span className="text-[11px] font-medium" style={{ color: accent }}>
+              {Math.round(progress)}%
+            </span>
+          </div>
+        </div>
       ) : (
-        <p className="mt-3 text-xs text-text-muted">{goal.totalLoggedMinutes} min logged</p>
+        <p className="mt-auto text-xs text-text-muted">{goal.totalLoggedMinutes} min logged</p>
       )}
     </div>
   )

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Clock, Maximize2, Minimize2, Music } from 'lucide-react'
 
 import { useGoals } from '../../goals/hooks/useGoals'
 import { useBeforeUnload } from '../hooks/useBeforeUnload'
@@ -12,7 +13,13 @@ import { BottomTaskBar } from './BottomTaskBar'
 import { SessionCompleteModal } from './SessionCompleteModal'
 import { TimerControls } from './TimerControls'
 import { TimerDisplay } from './TimerDisplay'
+import { YoutubePlayer } from './YoutubePlayer'
+import { ClockStylePicker } from './ClockStylePicker'
+import type { ClockStyle } from './ClockStylePicker'
 import type { GoalResponse, TaskResponse } from '../../../types/api'
+
+const BG_IMAGE =
+  'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80'
 
 export function FocusTimer() {
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null)
@@ -21,6 +28,13 @@ export function FocusTimer() {
   const [duration, setDuration] = useState(25)
   const [showCompleteModal, setShowCompleteModal] = useState(false)
   const [isTaskPanelOpen, setIsTaskPanelOpen] = useState(false)
+
+  // UI states
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showYoutube, setShowYoutube] = useState(false)
+  const [showClockPicker, setShowClockPicker] = useState(false)
+  const [clockStyle, setClockStyle] = useState<ClockStyle>('ring')
+
   const completeModalShown = useRef(false)
 
   const { data: goals = [] } = useGoals()
@@ -44,6 +58,21 @@ export function FocusTimer() {
 
   useHeartbeat()
   useBeforeUnload()
+
+  // Fullscreen change listener
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', onFsChange)
+    return () => document.removeEventListener('fullscreenchange', onFsChange)
+  }, [])
+
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {})
+    } else {
+      document.exitFullscreen().catch(() => {})
+    }
+  }
 
   useEffect(() => {
     if (isComplete && !completeModalShown.current) {
@@ -147,9 +176,100 @@ export function FocusTimer() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div
+      className="relative flex h-full flex-col overflow-hidden"
+      style={{
+        backgroundImage: `url('${BG_IMAGE}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'scroll',
+      }}
+    >
+      {/* Dark overlay */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: 'rgba(0,0,0,0.38)', zIndex: 0 }}
+      />
+
+      {/* Top-right action buttons */}
+      <div
+        className="absolute flex items-center gap-2"
+        style={{ top: 12, right: 16, zIndex: 20 }}
+      >
+        {/* Clock style picker toggle */}
+        <button
+          type="button"
+          onClick={() => { setShowClockPicker((v) => !v); setShowYoutube(false) }}
+          title="Kiểu đồng hồ"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: showClockPicker ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.10)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            color: showClockPicker ? '#fff' : 'rgba(255,255,255,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+        >
+          <Clock size={15} />
+        </button>
+
+        {/* Music toggle */}
+        <button
+          type="button"
+          onClick={() => { setShowYoutube((v) => !v); setShowClockPicker(false) }}
+          title="Nhạc nền"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: showYoutube ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.10)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            color: showYoutube ? '#fff' : 'rgba(255,255,255,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+        >
+          <Music size={15} />
+        </button>
+
+        {/* Fullscreen toggle */}
+        <button
+          type="button"
+          onClick={handleToggleFullscreen}
+          title={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.10)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            color: 'rgba(255,255,255,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.20)' }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.10)' }}
+        >
+          {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+        </button>
+      </div>
+
       {/* ── Main content area: clock centred vertically ── */}
-      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-4">
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-8 px-4">
         {/* Timer circle */}
         <TimerDisplay
           timeRemaining={timeRemaining}
@@ -158,6 +278,8 @@ export function FocusTimer() {
           taskTitle={taskTitle ?? selectedTask?.title ?? null}
           goalColor={goalColor ?? selectedGoal?.color ?? null}
           mode={mode}
+          idleDuration={duration}
+          clockStyle={clockStyle}
         />
 
         {/* Controls row: [↺]  [▶ Bắt đầu]  [⏭] */}
@@ -173,26 +295,28 @@ export function FocusTimer() {
       </div>
 
       {/* ── Floating bottom card + modal ── */}
-      <BottomTaskBar
-        goals={goals}
-        selectedGoal={selectedGoal}
-        selectedTask={selectedTask}
-        duration={duration}
-        mode={mode}
-        disabled={isActive}
-        isOpen={isTaskPanelOpen}
-        onToggle={() => setIsTaskPanelOpen((prev) => !prev)}
-        onClose={() => setIsTaskPanelOpen(false)}
-        onSelect={(task, goal) => {
-          setSelectedTask(task)
-          setSelectedGoal(goal)
-        }}
-        onDurationChange={setDuration}
-        onModeChange={(newMode) => {
-          setMode(newMode)
-          setDuration(newMode === 'WORK' ? 25 : 5)
-        }}
-      />
+      <div className="relative z-10">
+        <BottomTaskBar
+          goals={goals}
+          selectedGoal={selectedGoal}
+          selectedTask={selectedTask}
+          duration={duration}
+          mode={mode}
+          disabled={isActive}
+          isOpen={isTaskPanelOpen}
+          onToggle={() => setIsTaskPanelOpen((prev) => !prev)}
+          onClose={() => setIsTaskPanelOpen(false)}
+          onSelect={(task, goal) => {
+            setSelectedTask(task)
+            setSelectedGoal(goal)
+          }}
+          onDurationChange={setDuration}
+          onModeChange={(newMode) => {
+            setMode(newMode)
+            setDuration(newMode === 'WORK' ? 25 : 5)
+          }}
+        />
+      </div>
 
       <SessionCompleteModal
         isOpen={showCompleteModal}
@@ -201,6 +325,20 @@ export function FocusTimer() {
         saving={completeSession.isPending}
         onClose={() => setShowCompleteModal(false)}
         onConfirm={handleConfirmComplete}
+      />
+
+      {/* Floating YouTube Player */}
+      <YoutubePlayer
+        visible={showYoutube}
+        onClose={() => setShowYoutube(false)}
+      />
+
+      {/* Clock Style Picker */}
+      <ClockStylePicker
+        visible={showClockPicker}
+        currentStyle={clockStyle}
+        onSelect={setClockStyle}
+        onClose={() => setShowClockPicker(false)}
       />
     </div>
   )
