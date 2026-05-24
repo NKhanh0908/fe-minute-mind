@@ -1,20 +1,55 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { Mail, Lock, AlertCircle } from 'lucide-react'
 
 import { useLogin } from '../hooks/useLogin'
+import { AuthLayout } from './AuthLayout'
 
 const LABELS = {
-  title: 'Vilo',
-  subtitle: '\u0110\u0103ng nh\u1eadp v\u00e0o t\u00e0i kho\u1ea3n',
+  title: 'Đăng nhập',
+  subtitle: 'Chào mừng trở lại 👋',
   emailPlaceholder: 'Email',
-  passwordPlaceholder: 'M\u1eadt kh\u1ea9u',
-  submit: '\u0110\u0103ng nh\u1eadp',
-  submitting: '\u0110ang \u0111\u0103ng nh\u1eadp...',
-  noAccount: 'Ch\u01b0a c\u00f3 t\u00e0i kho\u1ea3n? ',
-  registerLink: '\u0110\u0103ng k\u00fd',
-  errorFallback: '\u0110\u0103ng nh\u1eadp th\u1ea5t b\u1ea1i, vui l\u00f2ng th\u1eed l\u1ea1i.',
+  passwordPlaceholder: 'Mật khẩu',
+  submit: 'Đăng nhập',
+  submitting: 'Đang đăng nhập...',
+  noAccount: 'Chưa có tài khoản? ',
+  registerLink: 'Đăng ký',
+  errorFallback: 'Đăng nhập thất bại, vui lòng thử lại.',
 } as const
+
+/* ── Shared input wrapper with left icon ── */
+function IconInput({
+  icon: Icon,
+  ...inputProps
+}: {
+  icon: React.ElementType
+} & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div style={{ position: 'relative' }}>
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 14,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: '#71717A',
+          display: 'flex',
+          alignItems: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        <Icon size={16} />
+      </span>
+      <input
+        {...inputProps}
+        className="auth-input"
+        style={{ paddingLeft: 42, ...(inputProps.style ?? {}) }}
+      />
+    </div>
+  )
+}
 
 export function LoginPage() {
   const [email, setEmail] = useState('')
@@ -27,52 +62,72 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-6">
-        <h1 className="mb-1 text-center text-2xl font-bold text-brand">{LABELS.title}</h1>
-        <p className="mb-6 text-center text-sm text-text-muted">{LABELS.subtitle}</p>
+    <AuthLayout>
+      {/* Card */}
+      <div className="auth-card">
+        {/* Header */}
+        <div style={{ marginBottom: 24 }}>
+          <h1
+            style={{
+              fontSize: 26,
+              fontWeight: 700,
+              color: '#F4F4F5',
+              margin: 0,
+            }}
+          >
+            {LABELS.title}
+          </h1>
+          <p style={{ fontSize: 14, color: '#71717A', marginTop: 4 }}>
+            {LABELS.subtitle}
+          </p>
+        </div>
 
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <input
-            className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
+        {/* Form */}
+        <form className="space-y-5" onSubmit={onSubmit}>
+          <IconInput
+            icon={Mail}
             type="email"
             placeholder={LABELS.emailPlaceholder}
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
           />
-          <input
-            className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
+          <IconInput
+            icon={Lock}
             type="password"
             placeholder={LABELS.passwordPlaceholder}
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
             minLength={8}
           />
 
+          {loginMutation.isError && (
+            <p className="auth-error">
+              <AlertCircle size={14} style={{ flexShrink: 0 }} />
+              {LABELS.errorFallback}
+            </p>
+          )}
+
           <button
-            className="flex w-full items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
+            className="auth-submit"
             type="submit"
             disabled={loginMutation.isPending}
           >
             {loginMutation.isPending ? LABELS.submitting : LABELS.submit}
           </button>
-
-          {loginMutation.isError ? (
-            <p className="text-sm text-status-danger">{LABELS.errorFallback}</p>
-          ) : null}
         </form>
 
-        <p className="mt-6 text-center text-sm text-text-muted">
+        {/* Link */}
+        <p className="auth-switch-link">
           {LABELS.noAccount}
-          <Link className="text-brand hover:text-brand-dark" to="/register">
+          <Link to="/register">
             {LABELS.registerLink}
           </Link>
         </p>
       </div>
-    </div>
+    </AuthLayout>
   )
 }

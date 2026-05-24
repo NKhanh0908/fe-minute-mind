@@ -1,26 +1,61 @@
-﻿import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { Mail, Lock, User, AlertCircle } from 'lucide-react'
 
 import { useRegister } from '../hooks/useRegister'
+import { AuthLayout } from './AuthLayout'
 
 const LABELS = {
-  title: 'Vilo',
-  subtitle: 'T\u1ea1o t\u00e0i kho\u1ea3n m\u1edbi',
-  namePlaceholder: 'H\u1ecd t\u00ean',
+  title: 'Tạo tài khoản',
+  subtitle: 'Bắt đầu hành trình của bạn',
+  namePlaceholder: 'Họ tên',
   emailPlaceholder: 'Email',
-  passwordPlaceholder: 'M\u1eadt kh\u1ea9u (\u2265 8 k\u00fd t\u1ef1)',
-  submit: '\u0110\u0103ng k\u00fd',
-  submitting: '\u0110ang \u0111\u0103ng k\u00fd...',
-  haveAccount: '\u0110\u00e3 c\u00f3 t\u00e0i kho\u1ea3n? ',
-  loginLink: '\u0110\u0103ng nh\u1eadp',
-  errorFallback: '\u0110\u0103ng k\u00fd th\u1ea5t b\u1ea1i, vui l\u00f2ng th\u1eed l\u1ea1i.',
-  emailInvalid: 'Email kh\u00f4ng h\u1ee3p l\u1ec7',
-  passwordTooShort: 'M\u1eadt kh\u1ea9u c\u1ea7n t\u1ed1i thi\u1ec3u 8 k\u00fd t\u1ef1',
-  nameRequired: 'Vui l\u00f2ng nh\u1eadp h\u1ecd t\u00ean',
+  passwordPlaceholder: 'Mật khẩu (≥ 8 ký tự)',
+  submit: 'Đăng ký',
+  submitting: 'Đang đăng ký...',
+  haveAccount: 'Đã có tài khoản? ',
+  loginLink: 'Đăng nhập',
+  errorFallback: 'Đăng ký thất bại, vui lòng thử lại.',
+  emailInvalid: 'Email không hợp lệ',
+  passwordTooShort: 'Mật khẩu cần tối thiểu 8 ký tự',
+  nameRequired: 'Vui lòng nhập họ tên',
 } as const
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/* ── Shared input wrapper with left icon ── */
+function IconInput({
+  icon: Icon,
+  ...inputProps
+}: {
+  icon: React.ElementType
+} & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div style={{ position: 'relative' }}>
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 14,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: '#71717A',
+          display: 'flex',
+          alignItems: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        <Icon size={16} />
+      </span>
+      <input
+        {...inputProps}
+        className="auth-input"
+        style={{ paddingLeft: 42, ...(inputProps.style ?? {}) }}
+      />
+    </div>
+  )
+}
 
 export function RegisterPage() {
   const [name, setName] = useState('')
@@ -42,64 +77,81 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-6">
-        <h1 className="mb-1 text-center text-2xl font-bold text-brand">{LABELS.title}</h1>
-        <p className="mb-6 text-center text-sm text-text-muted">{LABELS.subtitle}</p>
+    <AuthLayout>
+      {/* Card */}
+      <div className="auth-card">
+        {/* Header */}
+        <div style={{ marginBottom: 24 }}>
+          <h1
+            style={{
+              fontSize: 26,
+              fontWeight: 700,
+              color: '#F4F4F5',
+              margin: 0,
+            }}
+          >
+            {LABELS.title}
+          </h1>
+          <p style={{ fontSize: 14, color: '#71717A', marginTop: 4 }}>
+            {LABELS.subtitle}
+          </p>
+        </div>
 
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <input
-            className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
+        {/* Form */}
+        <form className="space-y-5" onSubmit={onSubmit}>
+          <IconInput
+            icon={User}
             type="text"
             placeholder={LABELS.namePlaceholder}
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(e) => setName(e.target.value)}
             required
             autoComplete="name"
           />
-          <input
-            className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
+          <IconInput
+            icon={Mail}
             type="email"
             placeholder={LABELS.emailPlaceholder}
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
           />
-          <input
-            className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
+          <IconInput
+            icon={Lock}
             type="password"
             placeholder={LABELS.passwordPlaceholder}
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
             minLength={8}
             autoComplete="new-password"
           />
 
+          {(validationError || (registerMutation.isError && !validationError)) && (
+            <p className="auth-error">
+              <AlertCircle size={14} style={{ flexShrink: 0 }} />
+              {validationError ?? LABELS.errorFallback}
+            </p>
+          )}
+
           <button
-            className="flex w-full items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
+            className="auth-submit"
             type="submit"
             disabled={registerMutation.isPending || Boolean(validationError)}
           >
             {registerMutation.isPending ? LABELS.submitting : LABELS.submit}
           </button>
-
-          {validationError ? (
-            <p className="text-sm text-status-danger">{validationError}</p>
-          ) : null}
-          {registerMutation.isError && !validationError ? (
-            <p className="text-sm text-status-danger">{LABELS.errorFallback}</p>
-          ) : null}
         </form>
 
-        <p className="mt-6 text-center text-sm text-text-muted">
+        {/* Link */}
+        <p className="auth-switch-link">
           {LABELS.haveAccount}
-          <Link className="text-brand hover:text-brand-dark" to="/login">
+          <Link to="/login">
             {LABELS.loginLink}
           </Link>
         </p>
       </div>
-    </div>
+    </AuthLayout>
   )
 }
