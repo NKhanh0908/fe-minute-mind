@@ -84,7 +84,7 @@ export function RegisterPage() {
         <div style={{ marginBottom: 24 }}>
           <h1
             style={{
-              fontSize: 22,
+              fontSize: 26,
               fontWeight: 700,
               color: '#F4F4F5',
               margin: 0,
@@ -98,7 +98,7 @@ export function RegisterPage() {
         </div>
 
         {/* Form */}
-        <form className="space-y-3" onSubmit={onSubmit}>
+        <form className="space-y-5" onSubmit={onSubmit}>
           <IconInput
             icon={User}
             type="text"
