@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Clock, Maximize2, Minimize2, Music } from 'lucide-react'
+import { Clock, Image, Maximize2, Minimize2, Music } from 'lucide-react'
 
 import { useGoals } from '../../goals/hooks/useGoals'
 import { useBeforeUnload } from '../hooks/useBeforeUnload'
@@ -16,10 +16,10 @@ import { TimerDisplay } from './TimerDisplay'
 import { YoutubePlayer } from './YoutubePlayer'
 import { ClockStylePicker } from './ClockStylePicker'
 import type { ClockStyle } from './ClockStylePicker'
+import { BackgroundPicker } from './BackgroundPicker'
+import { useBackground } from '../hooks/useBackground'
 import type { GoalResponse, TaskResponse } from '../../../types/api'
 
-const BG_IMAGE =
-  'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80'
 
 export function FocusTimer() {
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null)
@@ -33,7 +33,10 @@ export function FocusTimer() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showYoutube, setShowYoutube] = useState(false)
   const [showClockPicker, setShowClockPicker] = useState(false)
+  const [showBgPicker, setShowBgPicker] = useState(false)
   const [clockStyle, setClockStyle] = useState<ClockStyle>('ring')
+
+  const { currentBg, selectBackground } = useBackground()
 
   const completeModalShown = useRef(false)
 
@@ -179,7 +182,7 @@ export function FocusTimer() {
     <div
       className="relative flex h-full flex-col overflow-hidden"
       style={{
-        backgroundImage: `url('${BG_IMAGE}')`,
+        backgroundImage: `url('${currentBg.url}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'scroll',
@@ -199,7 +202,7 @@ export function FocusTimer() {
         {/* Clock style picker toggle */}
         <button
           type="button"
-          onClick={() => { setShowClockPicker((v) => !v); setShowYoutube(false) }}
+          onClick={() => { setShowClockPicker((v) => !v); setShowYoutube(false); setShowBgPicker(false) }}
           title="Kiểu đồng hồ"
           style={{
             width: 32,
@@ -222,7 +225,7 @@ export function FocusTimer() {
         {/* Music toggle */}
         <button
           type="button"
-          onClick={() => { setShowYoutube((v) => !v); setShowClockPicker(false) }}
+          onClick={() => { setShowYoutube((v) => !v); setShowClockPicker(false); setShowBgPicker(false) }}
           title="Nhạc nền"
           style={{
             width: 32,
@@ -240,6 +243,33 @@ export function FocusTimer() {
           }}
         >
           <Music size={15} />
+        </button>
+
+        {/* Background picker toggle */}
+        <button
+          type="button"
+          onClick={() => {
+            setShowBgPicker((v) => !v)
+            setShowYoutube(false)
+            setShowClockPicker(false)
+          }}
+          title="Ảnh nền"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: showBgPicker ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.10)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            color: showBgPicker ? '#fff' : 'rgba(255,255,255,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+        >
+          <Image size={15} />
         </button>
 
         {/* Fullscreen toggle */}
@@ -339,6 +369,14 @@ export function FocusTimer() {
         currentStyle={clockStyle}
         onSelect={setClockStyle}
         onClose={() => setShowClockPicker(false)}
+      />
+
+      {/* Background Picker */}
+      <BackgroundPicker
+        visible={showBgPicker}
+        currentId={currentBg.id}
+        onSelect={(id) => { selectBackground(id) }}
+        onClose={() => setShowBgPicker(false)}
       />
     </div>
   )
