@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Clock, Image, Maximize2, Minimize2, Music } from 'lucide-react'
 
 import { useGoals } from '../../goals/hooks/useGoals'
@@ -69,13 +69,13 @@ export function FocusTimer() {
     return () => document.removeEventListener('fullscreenchange', onFsChange)
   }, [])
 
-  const handleToggleFullscreen = () => {
+  const handleToggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {})
     } else {
       document.exitFullscreen().catch(() => {})
     }
-  }
+  }, [])
 
   useEffect(() => {
     if (isComplete && !completeModalShown.current) {
@@ -97,9 +97,12 @@ export function FocusTimer() {
   }, [isComplete, state, sessionId])
 
   const isActive = state !== 'IDLE'
-  const goalIdForActive = goals.find((g) => g.title === taskTitle)?.id ?? selectedGoal?.id ?? null
+  const goalIdForActive = useMemo(
+    () => goals.find((g) => g.title === taskTitle)?.id ?? selectedGoal?.id ?? null,
+    [goals, taskTitle, selectedGoal],
+  )
 
-  const handleStart = () => {
+  const handleStart = useCallback(() => {
     if (mode === 'BREAK') {
       startLocalBreakSession(duration)
       return
@@ -116,9 +119,10 @@ export function FocusTimer() {
         goalColor: selectedGoal?.color ?? null,
       },
     })
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, duration, selectedTask, selectedGoal, startLocalBreakSession])
 
-  const handleConfirmComplete = (input: {
+  const handleConfirmComplete = useCallback((input: {
     actualMinutes: number
     completedTask: boolean
     notes: string | null
@@ -150,9 +154,10 @@ export function FocusTimer() {
         },
       },
     )
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, actualMinutes, goalIdForActive])
 
-  const handleManualComplete = () => {
+  const handleManualComplete = useCallback(() => {
     if (!sessionId) {
       completeModalShown.current = false
       resetTimer()
@@ -161,9 +166,10 @@ export function FocusTimer() {
       return
     }
     setShowCompleteModal(true)
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId])
 
-  const handleDiscard = () => {
+  const handleDiscard = useCallback(() => {
     if (!sessionId) {
       setShowCompleteModal(false)
       completeModalShown.current = false
@@ -176,7 +182,8 @@ export function FocusTimer() {
         completeModalShown.current = false
       },
     })
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId])
 
   return (
     <div

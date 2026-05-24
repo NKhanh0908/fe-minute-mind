@@ -38,15 +38,15 @@ export function ClockStylePicker({ visible, currentStyle, onSelect, onClose }: C
         position: 'fixed',
         top: 52,
         right: 16,
-        width: 220,
+        width: 300,
         zIndex: 50,
         visibility: visible ? 'visible' : 'hidden',
         opacity: visible ? 1 : 0,
-        borderRadius: 14,
+        borderRadius: 16,
         background: 'rgba(10,10,18,0.92)',
         backdropFilter: 'blur(20px)',
         border: '1px solid rgba(255,255,255,0.12)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.65)',
         overflow: 'hidden',
         transition: 'opacity 0.15s ease, visibility 0.15s',
       }}
@@ -54,7 +54,7 @@ export function ClockStylePicker({ visible, currentStyle, onSelect, onClose }: C
       {/* Header */}
       <div
         style={{
-          padding: '10px 14px',
+          padding: '12px 16px',
           borderBottom: '1px solid rgba(255,255,255,0.07)',
           display: 'flex',
           alignItems: 'center',
@@ -62,8 +62,8 @@ export function ClockStylePicker({ visible, currentStyle, onSelect, onClose }: C
           color: 'rgba(255,255,255,0.65)',
         }}
       >
-        <Clock size={13} />
-        <span style={{ fontSize: 12, fontWeight: 500 }}>Kiểu đồng hồ</span>
+        <Clock size={14} />
+        <span style={{ fontSize: 13, fontWeight: 600 }}>Kiểu đồng hồ</span>
       </div>
 
       {/* Options */}
@@ -79,9 +79,9 @@ export function ClockStylePicker({ visible, currentStyle, onSelect, onClose }: C
                 width: '100%',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                padding: '8px 10px',
-                borderRadius: 9,
+                gap: 12,
+                padding: '10px 12px',
+                borderRadius: 10,
                 border: 'none',
                 background: isActive ? 'rgba(99,102,241,0.18)' : 'transparent',
                 cursor: 'pointer',
@@ -98,14 +98,14 @@ export function ClockStylePicker({ visible, currentStyle, onSelect, onClose }: C
               {/* Preview icon */}
               <span
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
                   background: isActive ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.07)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 15,
+                  fontSize: 18,
                   flexShrink: 0,
                   border: isActive ? '1px solid rgba(99,102,241,0.5)' : '1px solid rgba(255,255,255,0.08)',
                 }}
@@ -113,10 +113,10 @@ export function ClockStylePicker({ visible, currentStyle, onSelect, onClose }: C
                 {s.preview}
               </span>
               <div>
-                <p style={{ fontSize: 12, fontWeight: 600, color: isActive ? '#818cf8' : 'rgba(255,255,255,0.85)', margin: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: isActive ? '#818cf8' : 'rgba(255,255,255,0.85)', margin: 0 }}>
                   {s.label}
                 </p>
-                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', margin: 0, marginTop: 1 }}>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0, marginTop: 2 }}>
                   {s.desc}
                 </p>
               </div>

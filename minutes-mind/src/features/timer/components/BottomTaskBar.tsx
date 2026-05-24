@@ -1,5 +1,5 @@
 import { ChevronDown, ClipboardList, X } from 'lucide-react'
-import { useCallback, useEffect, useRef } from 'react'
+import { memo, useCallback, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 import type { GoalResponse, TaskResponse } from '../../../types/api'
@@ -21,7 +21,7 @@ interface BottomTaskBarProps {
   onModeChange: (mode: 'WORK' | 'BREAK') => void
 }
 
-export function BottomTaskBar({
+export const BottomTaskBar = memo(function BottomTaskBar({
   goals,
   selectedGoal,
   selectedTask,
@@ -127,9 +127,8 @@ export function BottomTaskBar({
           className="fixed inset-0 z-50 flex items-end justify-center"
           style={{
             backgroundColor: isOpen ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0)',
-            backdropFilter: isOpen ? 'blur(2px)' : 'none',
             pointerEvents: isOpen ? 'auto' : 'none',
-            transition: 'background-color 0.2s ease, backdrop-filter 0.2s ease',
+            transition: 'background-color 0.2s ease',
           }}
           onClick={handleBackdropClick}
         >
@@ -255,4 +254,4 @@ export function BottomTaskBar({
       )}
     </>
   )
-}
+})

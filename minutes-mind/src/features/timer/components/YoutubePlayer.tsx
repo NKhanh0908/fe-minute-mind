@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { X } from 'lucide-react'
 
 interface YoutubePlayerProps {
@@ -52,34 +52,6 @@ export function YoutubePlayer({ visible, onClose }: YoutubePlayerProps) {
   const [url, setUrl] = useState('')
   const [embedUrl, setEmbedUrl] = useState<string | null>(null)
   const [urlError, setUrlError] = useState(false)
-  const [pos, setPos] = useState({
-    x: typeof window !== 'undefined' ? Math.max(0, window.innerWidth / 2 - 190) : 40,
-    y: 60,
-  })
-
-  const dragging = useRef(false)
-  const offset = useRef({ x: 0, y: 0 })
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      if (!dragging.current) return
-      setPos({ x: e.clientX - offset.current.x, y: e.clientY - offset.current.y })
-    }
-    const onMouseUp = () => { dragging.current = false }
-    window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('mouseup', onMouseUp)
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
-    }
-  }, [])
-
-  const handleHeaderMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only drag if clicking the header area (not tabs/buttons)
-    if ((e.target as HTMLElement).closest('button')) return
-    dragging.current = true
-    offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }
-  }
 
   const handlePlayUrl = () => {
     const parsed = parseYoutubeUrl(url)
@@ -98,8 +70,8 @@ export function YoutubePlayer({ visible, onClose }: YoutubePlayerProps) {
     <div
       style={{
         position: 'fixed',
-        left: pos.x,
-        top: pos.y,
+        top: 52,
+        right: 16,
         width: 380,
         zIndex: 50,
         visibility: visible ? 'visible' : 'hidden',
@@ -111,14 +83,11 @@ export function YoutubePlayer({ visible, onClose }: YoutubePlayerProps) {
         boxShadow: '0 12px 48px rgba(0,0,0,0.7)',
         overflow: 'hidden',
         transition: 'opacity 0.15s ease, visibility 0.15s',
-        userSelect: 'none',
       }}
     >
-      {/* ── Header (drag handle) ── */}
+      {/* ── Header ── */}
       <div
-        onMouseDown={handleHeaderMouseDown}
         style={{
-          cursor: 'grab',
           padding: '14px 16px 0',
           display: 'flex',
           alignItems: 'center',

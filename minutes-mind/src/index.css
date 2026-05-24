@@ -33,16 +33,26 @@ a {
 main::-webkit-scrollbar {
   display: none;
 }
+
 main {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
 
 /* ── Auth pages shared styles ──────────────────────────────────────── */
 
 @keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Card wrapper */
@@ -52,7 +62,7 @@ main {
   background: #1A1A1F;
   border-radius: 20px;
   padding: 40px 36px;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 24px 64px rgba(0,0,0,0.45);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 24px 64px rgba(0, 0, 0, 0.45);
   animation: fadeSlideUp 0.35s ease-out 0.05s both;
 }
 

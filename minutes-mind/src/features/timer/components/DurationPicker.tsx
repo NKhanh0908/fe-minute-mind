@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 const PRESETS_WORK = [25, 45, 60, 90] as const
 const PRESETS_BREAK = [5, 10, 15, 30] as const
 
@@ -14,7 +16,7 @@ interface DurationPickerProps {
   disabled?: boolean
 }
 
-export function DurationPicker({ value, mode, onModeChange, onChange, disabled = false }: DurationPickerProps) {
+export const DurationPicker = memo(function DurationPicker({ value, mode, onModeChange, onChange, disabled = false }: DurationPickerProps) {
   const currentPresets = mode === 'WORK' ? PRESETS_WORK : PRESETS_BREAK
 
   return (
@@ -80,4 +82,4 @@ export function DurationPicker({ value, mode, onModeChange, onChange, disabled =
       </label>
     </div>
   )
-}
+})

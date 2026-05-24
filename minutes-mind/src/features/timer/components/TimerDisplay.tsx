@@ -62,7 +62,9 @@ function RingClock({
         borderRadius: '50%',
         backdropFilter: 'blur(12px)',
         background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.10)',
+        border: `1px solid ${accent}44`,
+        boxShadow: `0 0 0 1px ${accent}22, 0 0 48px ${accent}22`,
+        transition: 'border-color 0.5s ease, box-shadow 0.5s ease',
       }}
     >
       <svg
@@ -70,20 +72,22 @@ function RingClock({
         viewBox={`0 0 ${size} ${size}`}
         style={{ width: '100%', height: '100%' }}
       >
-        <circle cx={cx} cy={cy} r={radius} stroke="rgba(255,255,255,0.18)" strokeWidth="10" fill="none" />
+        {/* Track: tinted with accent */}
+        <circle cx={cx} cy={cy} r={radius} stroke={`${accent}30`} strokeWidth="10" fill="none" />
+        {/* Progress arc */}
         <circle
           cx={cx} cy={cy} r={radius}
           stroke={accent} strokeWidth="10" fill="none"
           strokeDasharray={circumference} strokeDashoffset={offset}
           strokeLinecap="round"
-          style={{ transition: 'stroke-dashoffset 0.4s linear, stroke 0.5s ease', filter: `drop-shadow(0 0 8px ${accent}88)` }}
+          style={{ transition: 'stroke-dashoffset 0.4s linear, stroke 0.5s ease', filter: `drop-shadow(0 0 12px ${accent}cc)` }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
         <span className="font-mono font-bold leading-none" style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', color: '#FFFFFF', letterSpacing: '-0.02em' }}>
           {formatMMSS(displaySeconds)}
         </span>
-        <span className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: accent, transition: 'color 0.5s ease' }}>
+        <span className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: accent, transition: 'color 0.5s ease', textShadow: `0 0 12px ${accent}99` }}>
           {STATE_LABEL[state]}
         </span>
       </div>
@@ -107,9 +111,11 @@ function MinimalClock({
       style={{
         backdropFilter: 'blur(12px)',
         background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.10)',
+        border: `1px solid ${accent}44`,
         borderRadius: 24,
         padding: 'clamp(24px, 4vw, 48px) clamp(32px, 6vw, 80px)',
+        boxShadow: `0 0 32px ${accent}22`,
+        transition: 'border-color 0.5s ease, box-shadow 0.5s ease',
       }}
     >
       <span
@@ -119,8 +125,8 @@ function MinimalClock({
         {formatMMSS(displaySeconds)}
       </span>
       {/* Accent thin line */}
-      <div style={{ width: 40, height: 2, borderRadius: 2, background: accent, transition: 'background 0.5s' }} />
-      <span className="text-xs font-medium tracking-[0.25em] uppercase" style={{ color: accent }}>
+      <div style={{ width: 40, height: 2, borderRadius: 2, background: accent, transition: 'background 0.5s', boxShadow: `0 0 8px ${accent}99` }} />
+      <span className="text-xs font-medium tracking-[0.25em] uppercase" style={{ color: accent, transition: 'color 0.5s', textShadow: `0 0 10px ${accent}88` }}>
         {STATE_LABEL[state]}
       </span>
     </div>
@@ -171,14 +177,20 @@ function FlipClock({
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2"
+        style={{
+          filter: `drop-shadow(0 0 16px ${accent}55)`,
+          transition: 'filter 0.5s ease',
+        }}
+      >
         <FlipDigit char={m1} />
         <FlipDigit char={m2} />
-        <span className="font-mono font-bold" style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(1.8rem, 4vw, 3.5rem)', marginBottom: 4 }}>:</span>
+        <span className="font-mono font-bold" style={{ color: `${accent}cc`, fontSize: 'clamp(1.8rem, 4vw, 3.5rem)', marginBottom: 4, transition: 'color 0.5s' }}>:</span>
         <FlipDigit char={s1} />
         <FlipDigit char={s2} />
       </div>
-      <span className="text-xs font-medium tracking-[0.25em] uppercase" style={{ color: accent }}>
+      <span className="text-xs font-medium tracking-[0.25em] uppercase" style={{ color: accent, transition: 'color 0.5s', textShadow: `0 0 10px ${accent}88` }}>
         {STATE_LABEL[state]}
       </span>
     </div>

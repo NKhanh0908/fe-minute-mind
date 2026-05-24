@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 
 import { useTasks } from '../../tasks/hooks/useTasks'
 import type { GoalResponse, TaskResponse } from '../../../types/api'
@@ -18,7 +18,7 @@ interface TaskSelectorProps {
   disabled?: boolean
 }
 
-export function TaskSelector({ goals, selectedTask, onSelect, disabled = false }: TaskSelectorProps) {
+export const TaskSelector = memo(function TaskSelector({ goals, selectedTask, onSelect, disabled = false }: TaskSelectorProps) {
   const [manualGoalId, setManualGoalId] = useState<number | null>(null)
 
   const goalId = useMemo<number | null>(() => {
@@ -96,4 +96,4 @@ export function TaskSelector({ goals, selectedTask, onSelect, disabled = false }
       ) : null}
     </div>
   )
-}
+})

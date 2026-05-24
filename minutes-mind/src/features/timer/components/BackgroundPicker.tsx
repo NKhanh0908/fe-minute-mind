@@ -45,20 +45,20 @@ export function BackgroundPicker({ visible, currentId, onSelect, onClose }: Back
         position: 'fixed',
         top: 52,
         right: 16,
-        zIndex: 55, // above ClockStylePicker (z-50) so they don't overlap wrongly
-        width: 280,
+        zIndex: 55,
+        width: 420,
         background: 'rgba(10, 10, 18, 0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         border: '1px solid rgba(255, 255, 255, 0.12)',
-        borderRadius: 16,
-        padding: 14,
-        boxShadow: '0 16px 48px rgba(0, 0, 0, 0.6)',
+        borderRadius: 18,
+        padding: 18,
+        boxShadow: '0 20px 56px rgba(0, 0, 0, 0.65)',
       }}
     >
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255, 255, 255, 0.6)' }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255, 255, 255, 0.7)' }}>
           Ảnh nền
         </span>
         <button
@@ -89,8 +89,8 @@ export function BackgroundPicker({ visible, currentId, onSelect, onClose }: Back
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 8,
-          marginTop: 12,
+          gap: 10,
+          marginTop: 14,
         }}
       >
         {BACKGROUND_PRESETS.map((preset) => {
@@ -138,11 +138,12 @@ export function BackgroundPicker({ visible, currentId, onSelect, onClose }: Back
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  padding: '4px 6px',
-                  background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                  fontSize: 10,
-                  color: 'rgba(255,255,255,0.85)',
+                  padding: '5px 7px',
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.72))',
+                  fontSize: 11,
+                  color: 'rgba(255,255,255,0.9)',
                   textAlign: 'center',
+                  fontWeight: 500,
                 }}
               >
                 {preset.label}
@@ -153,15 +154,16 @@ export function BackgroundPicker({ visible, currentId, onSelect, onClose }: Back
                 <span
                   style={{
                     position: 'absolute',
-                    top: 4,
-                    right: 4,
-                    width: 18,
-                    height: 18,
+                    top: 5,
+                    right: 5,
+                    width: 22,
+                    height: 22,
                     borderRadius: '50%',
                     background: '#6366f1',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(99,102,241,0.5)',
                   }}
                 >
                   <Check size={11} color="#fff" />
