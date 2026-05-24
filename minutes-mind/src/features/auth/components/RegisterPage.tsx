@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { Mail, Lock, User, AlertCircle } from 'lucide-react'
 
 import { useRegister } from '../hooks/useRegister'
+import { AuthLayout } from './AuthLayout'
 
 const LABELS = {
-  title: 'Vilo',
-  subtitle: 'Tạo tài khoản mới',
+  title: 'Tạo tài khoản',
+  subtitle: 'Bắt đầu hành trình của bạn',
   namePlaceholder: 'Họ tên',
   emailPlaceholder: 'Email',
   passwordPlaceholder: 'Mật khẩu (≥ 8 ký tự)',
@@ -21,6 +23,39 @@ const LABELS = {
 } as const
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/* ── Shared input wrapper with left icon ── */
+function IconInput({
+  icon: Icon,
+  ...inputProps
+}: {
+  icon: React.ElementType
+} & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div style={{ position: 'relative' }}>
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 14,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: '#71717A',
+          display: 'flex',
+          alignItems: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        <Icon size={16} />
+      </span>
+      <input
+        {...inputProps}
+        className="auth-input"
+        style={{ paddingLeft: 42, ...(inputProps.style ?? {}) }}
+      />
+    </div>
+  )
+}
 
 export function RegisterPage() {
   const [name, setName] = useState('')
@@ -41,64 +76,82 @@ export function RegisterPage() {
     registerMutation.mutate({ name: name.trim(), email: email.trim(), password })
   }
 
-  const inputClass = 'w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-brand focus:outline-none hover:border-border/70'
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div
-        className="pointer-events-none fixed inset-0"
-        style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 70%)' }}
-      />
-
-      <div className="relative w-full max-w-sm">
-        <div
-          className="rounded-2xl border border-border bg-surface p-8"
-          style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.03), 0 20px 60px rgba(0,0,0,0.4)' }}
-        >
-          {/* Logo + heading */}
-          <div className="mb-8 text-center">
-            <div
-              className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', boxShadow: '0 4px 16px rgba(99,102,241,0.35)' }}
-            >
-              <span className="text-xl font-bold text-white">V</span>
-            </div>
-            <h1 className="text-2xl font-bold text-text-primary">{LABELS.title}</h1>
-            <p className="mt-1 text-sm text-text-muted">{LABELS.subtitle}</p>
-          </div>
-
-          <form className="space-y-3" onSubmit={onSubmit}>
-            <input className={inputClass} type="text" placeholder={LABELS.namePlaceholder} value={name}
-              onChange={(e) => setName(e.target.value)} required autoComplete="name" />
-            <input className={inputClass} type="email" placeholder={LABELS.emailPlaceholder} value={email}
-              onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-            <input className={inputClass} type="password" placeholder={LABELS.passwordPlaceholder} value={password}
-              onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
-
-            {(validationError || (registerMutation.isError && !validationError)) && (
-              <p className="rounded-lg bg-red-950/50 px-3 py-2 text-sm text-status-danger border border-red-900/40">
-                {validationError ?? LABELS.errorFallback}
-              </p>
-            )}
-
-            <button
-              className="flex w-full items-center justify-center rounded-xl py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', boxShadow: '0 4px 16px rgba(99,102,241,0.3)', marginTop: 8 }}
-              type="submit"
-              disabled={registerMutation.isPending || Boolean(validationError)}
-            >
-              {registerMutation.isPending ? LABELS.submitting : LABELS.submit}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-text-muted">
-            {LABELS.haveAccount}
-            <Link className="font-medium text-brand hover:text-brand-dark transition-colors" to="/login">
-              {LABELS.loginLink}
-            </Link>
+    <AuthLayout>
+      {/* Card */}
+      <div className="auth-card">
+        {/* Header */}
+        <div style={{ marginBottom: 24 }}>
+          <h1
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: '#F4F4F5',
+              margin: 0,
+            }}
+          >
+            {LABELS.title}
+          </h1>
+          <p style={{ fontSize: 14, color: '#71717A', marginTop: 4 }}>
+            {LABELS.subtitle}
           </p>
         </div>
+
+        {/* Form */}
+        <form className="space-y-3" onSubmit={onSubmit}>
+          <IconInput
+            icon={User}
+            type="text"
+            placeholder={LABELS.namePlaceholder}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoComplete="name"
+          />
+          <IconInput
+            icon={Mail}
+            type="email"
+            placeholder={LABELS.emailPlaceholder}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+          <IconInput
+            icon={Lock}
+            type="password"
+            placeholder={LABELS.passwordPlaceholder}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+            autoComplete="new-password"
+          />
+
+          {(validationError || (registerMutation.isError && !validationError)) && (
+            <p className="auth-error">
+              <AlertCircle size={14} style={{ flexShrink: 0 }} />
+              {validationError ?? LABELS.errorFallback}
+            </p>
+          )}
+
+          <button
+            className="auth-submit"
+            type="submit"
+            disabled={registerMutation.isPending || Boolean(validationError)}
+          >
+            {registerMutation.isPending ? LABELS.submitting : LABELS.submit}
+          </button>
+        </form>
+
+        {/* Link */}
+        <p className="auth-switch-link">
+          {LABELS.haveAccount}
+          <Link to="/login">
+            {LABELS.loginLink}
+          </Link>
+        </p>
       </div>
-    </div>
+    </AuthLayout>
   )
 }
