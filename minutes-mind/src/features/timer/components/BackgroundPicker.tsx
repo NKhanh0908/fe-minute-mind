@@ -11,18 +11,30 @@ interface BackgroundPickerProps {
 
 export function BackgroundPicker({ visible, currentId, onSelect, onClose }: BackgroundPickerProps) {
   const popoverRef = useRef<HTMLDivElement>(null)
+  // Stable ref to onClose to avoid stale-closure / effect re-run issues
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
-  // Click outside → close
+  // Click outside → close. Only depend on `visible` to prevent listener churn.
   useEffect(() => {
     if (!visible) return
+
     const handleMouseDown = (e: MouseEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-        onClose()
+        onCloseRef.current()
       }
     }
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [visible, onClose])
+
+    // Small delay so the mousedown that opened the picker doesn't immediately close it
+    const timerId = setTimeout(() => {
+      document.addEventListener('mousedown', handleMouseDown)
+    }, 0)
+
+    return () => {
+      clearTimeout(timerId)
+      document.removeEventListener('mousedown', handleMouseDown)
+    }
+  }, [visible]) // ← only `visible`, not `onClose` — prevents listener churn on every FocusTimer re-render
 
   if (!visible) return null
 
@@ -33,7 +45,7 @@ export function BackgroundPicker({ visible, currentId, onSelect, onClose }: Back
         position: 'fixed',
         top: 52,
         right: 16,
-        zIndex: 30,
+        zIndex: 55, // above ClockStylePicker (z-50) so they don't overlap wrongly
         width: 280,
         background: 'rgba(10, 10, 18, 0.92)',
         backdropFilter: 'blur(20px)',
