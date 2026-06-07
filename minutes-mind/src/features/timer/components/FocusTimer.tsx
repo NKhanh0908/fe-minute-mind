@@ -10,9 +10,11 @@ import { useStartSession } from '../hooks/useStartSession'
 import { useTimerTick } from '../hooks/useTimerTick'
 import { useTimerStore } from '../store/useTimerStore'
 import { useNotificationSound } from '../hooks/useNotificationSound'
+import { useSessionHistory } from '../hooks/useSessionHistory'
 import { FOCUS_END_SOUND, BREAK_END_SOUND } from '../constants/sounds'
 import { BottomTaskBar } from './BottomTaskBar'
 import { SessionCompleteModal } from './SessionCompleteModal'
+import { SessionObjectiveInput } from './SessionObjectiveInput'
 import { TimerControls } from './TimerControls'
 import { TimerDisplay } from './TimerDisplay'
 import { YoutubePlayer } from './YoutubePlayer'
@@ -56,11 +58,15 @@ export function FocusTimer() {
   const startLocalBreakSession = useTimerStore((s) => s.startLocalBreakSession)
   const resetTimer = useTimerStore((s) => s.reset)
 
+  const sessionObjective = useTimerStore((s) => s.sessionObjective)
+  const clearSessionObjective = useTimerStore((s) => s.clearSessionObjective)
+
   const startSession = useStartSession()
   const completeSession = useCompleteSession()
   const discardSession = useDiscardSession()
   const { isComplete } = useTimerTick()
   const { play: playSound, stop: stopSound } = useNotificationSound()
+  const { addRecord } = useSessionHistory()
 
   useHeartbeat()
   useBeforeUnload()
@@ -143,6 +149,7 @@ export function FocusTimer() {
       setShowCompleteModal(false)
       completeModalShown.current = false
       resetTimer()
+      clearSessionObjective()
       setMode('WORK')
       setDuration(25)
       return
@@ -161,13 +168,24 @@ export function FocusTimer() {
         onSettled: () => {
           setShowCompleteModal(false)
           completeModalShown.current = false
+          // Save to local history before clearing objective
+          addRecord({
+            sessionId,
+            taskTitle: taskTitle ?? null,
+            objective: sessionObjective,
+            result: (() => {
+              try { return input.notes ? JSON.parse(input.notes)?.result ?? null : null } catch { return null }
+            })(),
+            actualMinutes: Math.max(input.actualMinutes, actualMinutes),
+          })
+          clearSessionObjective()
           setMode('BREAK')
           setDuration(5)
         },
       },
     )
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, actualMinutes, goalIdForActive])
+  }, [sessionId, actualMinutes, goalIdForActive, sessionObjective])
 
   const handleManualComplete = useCallback(() => {
     if (!sessionId) {
@@ -186,12 +204,14 @@ export function FocusTimer() {
       setShowCompleteModal(false)
       completeModalShown.current = false
       resetTimer()
+      clearSessionObjective()
       return
     }
     discardSession.mutate(sessionId, {
       onSettled: () => {
         setShowCompleteModal(false)
         completeModalShown.current = false
+        clearSessionObjective()
       },
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -331,6 +351,11 @@ export function FocusTimer() {
           clockStyle={clockStyle}
         />
 
+        {/* Session objective — shown only when idle */}
+        {state === 'IDLE' && (
+          <SessionObjectiveInput />
+        )}
+
         {/* Controls row: [↺]  [▶ Bắt đầu]  [⏭] */}
         <TimerControls
           state={state}
@@ -371,6 +396,7 @@ export function FocusTimer() {
         isOpen={showCompleteModal}
         taskTitle={taskTitle ?? selectedTask?.title ?? null}
         actualMinutes={actualMinutes}
+        sessionObjective={sessionObjective}
         saving={completeSession.isPending}
         onClose={() => setShowCompleteModal(false)}
         onConfirm={handleConfirmComplete}

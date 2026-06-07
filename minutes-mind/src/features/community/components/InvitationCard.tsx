@@ -1,5 +1,4 @@
 import { Check, X } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
 import type { GoalInvitationResponse } from '../../../types/api'
 import { useRespondInvitation } from '../hooks/useRespondInvitation'
 import { Avatar } from '../../../components/ui/Avatar'
@@ -9,19 +8,7 @@ interface InvitationCardProps {
 }
 
 export function InvitationCard({ invitation }: InvitationCardProps) {
-  const queryClient = useQueryClient()
   const respond = useRespondInvitation()
-
-  const handleRespond = (accept: boolean) => {
-    respond.mutate(
-      { id: invitation.id, body: { accept } },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['community', 'invitations'] })
-        },
-      },
-    )
-  }
 
   return (
     <div className="flex items-center gap-3 rounded-xl border border-border bg-surface p-4">
