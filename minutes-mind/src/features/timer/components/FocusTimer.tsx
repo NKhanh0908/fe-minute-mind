@@ -9,6 +9,8 @@ import { useHeartbeat } from '../hooks/useHeartbeat'
 import { useStartSession } from '../hooks/useStartSession'
 import { useTimerTick } from '../hooks/useTimerTick'
 import { useTimerStore } from '../store/useTimerStore'
+import { useNotificationSound } from '../hooks/useNotificationSound'
+import { FOCUS_END_SOUND, BREAK_END_SOUND } from '../constants/sounds'
 import { BottomTaskBar } from './BottomTaskBar'
 import { SessionCompleteModal } from './SessionCompleteModal'
 import { TimerControls } from './TimerControls'
@@ -58,6 +60,7 @@ export function FocusTimer() {
   const completeSession = useCompleteSession()
   const discardSession = useDiscardSession()
   const { isComplete } = useTimerTick()
+  const { play: playSound, stop: stopSound } = useNotificationSound()
 
   useHeartbeat()
   useBeforeUnload()
@@ -79,6 +82,13 @@ export function FocusTimer() {
 
   useEffect(() => {
     if (isComplete && !completeModalShown.current) {
+      // Play the appropriate notification sound based on which session just ended
+      if (state === 'RUNNING') {
+        playSound(FOCUS_END_SOUND)
+      } else if (state === 'BREAK') {
+        playSound(BREAK_END_SOUND)
+      }
+
       if (!sessionId) {
         completeModalShown.current = false
         resetTimer()
@@ -103,6 +113,8 @@ export function FocusTimer() {
   )
 
   const handleStart = useCallback(() => {
+    // Stop any lingering notification sound before starting a new session
+    stopSound()
     if (mode === 'BREAK') {
       startLocalBreakSession(duration)
       return
@@ -120,7 +132,7 @@ export function FocusTimer() {
       },
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, duration, selectedTask, selectedGoal, startLocalBreakSession])
+  }, [mode, duration, selectedTask, selectedGoal, startLocalBreakSession, stopSound])
 
   const handleConfirmComplete = useCallback((input: {
     actualMinutes: number
