@@ -5,6 +5,9 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { useLogout } from '../features/auth/hooks/useLogout'
 import { useAuthStore } from '../features/auth/store/useAuthStore'
 import { useMyInvitations } from '../features/community/hooks/useMyInvitations'
+import { Theme, useThemeStore } from '../features/theme/store/useThemeStore'
+import { ThemeSwitcher } from '../features/theme/components/ThemeSwitcher'
+import { useTimerStore } from '../features/timer/store/useTimerStore'
 
 const NAV_LABELS = {
   timer: 'Timer',
@@ -28,6 +31,9 @@ export function AppShell() {
   const { data: invitations = [] } = useMyInvitations()
   const pendingInvites = invitations.filter((i) => i.status === 'PENDING').length
 
+  const theme = useThemeStore((s) => s.theme)
+  const timerState = useTimerStore((s) => s.state)
+
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
@@ -36,17 +42,21 @@ export function AppShell() {
     return () => document.removeEventListener('fullscreenchange', onFsChange)
   }, [])
 
+  // Deep Focus: sidebar hides when theme is deep-focus AND a session is active
+  const isDeepFocusActive = theme === Theme.DEEP_FOCUS && timerState !== 'IDLE'
+  const hideSidebar = isFullscreen || isDeepFocusActive
+
   return (
     <div className="flex h-screen bg-background text-text-primary">
-      {/* Desktop sidebar — hidden when fullscreen */}
+      {/* Desktop sidebar — hidden when fullscreen or Deep Focus active */}
       <aside
         className="hidden w-60 flex-col border-r border-border bg-surface md:flex overflow-hidden"
         style={{
-          width: isFullscreen ? 0 : undefined,
-          minWidth: isFullscreen ? 0 : undefined,
-          opacity: isFullscreen ? 0 : 1,
-          pointerEvents: isFullscreen ? 'none' : 'auto',
-          transition: 'width 0.25s ease, opacity 0.2s ease',
+          width: hideSidebar ? 0 : undefined,
+          minWidth: hideSidebar ? 0 : undefined,
+          opacity: hideSidebar ? 0 : 1,
+          pointerEvents: hideSidebar ? 'none' : 'auto',
+          transition: 'width 0.3s ease, opacity 0.25s ease',
         }}
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-4">
@@ -82,6 +92,10 @@ export function AppShell() {
             {NAV_LABELS.profile}
           </NavLink>
         </nav>
+
+        {/* Theme switcher — collapsible panel above logout */}
+        <ThemeSwitcher />
+
         <button
           type="button"
           onClick={() => logout.mutate()}
@@ -97,14 +111,14 @@ export function AppShell() {
         <Outlet />
       </main>
 
-      {/* Mobile bottom nav — hidden when fullscreen */}
+      {/* Mobile bottom nav — hidden when fullscreen or Deep Focus active */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-border bg-surface px-4 py-2 md:hidden"
         style={{
-          transform: isFullscreen ? 'translateY(100%)' : 'translateY(0)',
-          opacity: isFullscreen ? 0 : 1,
-          pointerEvents: isFullscreen ? 'none' : 'auto',
-          transition: 'transform 0.25s ease, opacity 0.2s ease',
+          transform: hideSidebar ? 'translateY(100%)' : 'translateY(0)',
+          opacity: hideSidebar ? 0 : 1,
+          pointerEvents: hideSidebar ? 'none' : 'auto',
+          transition: 'transform 0.3s ease, opacity 0.25s ease',
         }}
       >
         <NavLink to="/app/timer" className={navItemClass}>

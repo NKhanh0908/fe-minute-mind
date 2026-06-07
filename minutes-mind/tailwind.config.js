@@ -3,20 +3,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        background:   '#0F0F11',
-        surface:      '#1A1A1F',
-        'surface-2':  '#25252D',
-        border:       '#2E2E38',
-        brand:        '#6366F1',
-        'brand-dark': '#4F46E5',
-        'brand-light':'#EEF2FF',
-        'text-primary':  '#F4F4F5',
-        'text-muted':    '#71717A',
-        'text-disabled': '#3F3F46',
-        'status-success':'#22C55E',
-        'status-warning':'#F59E0B',
-        'status-danger': '#EF4444',
-        'status-info':   '#3B82F6',
+        // ── Theme-aware tokens (driven by CSS custom properties) ──────────
+        // Values are set per-theme in index.css via :root / html.theme-* selectors.
+        background:     'var(--color-bg)',
+        surface:        'var(--color-surface)',
+        'surface-2':    'var(--color-surface-2)',
+        border:         'var(--color-border)',
+        brand:          'var(--color-brand)',
+        'brand-dark':   'var(--color-brand-dark)',
+        'brand-light':  'var(--color-brand-light)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-muted':   'var(--color-text-muted)',
+
+        // ── Static tokens (same across all themes) ────────────────────────
+        'text-disabled':  '#3F3F46',
+        'status-success': '#22C55E',
+        'status-warning': '#F59E0B',
+        'status-danger':  '#EF4444',
+        'status-info':    '#3B82F6',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -33,4 +37,4 @@ export default {
     },
   },
   plugins: [],
-}
+}

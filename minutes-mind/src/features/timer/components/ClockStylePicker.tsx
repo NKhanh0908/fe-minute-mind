@@ -1,5 +1,4 @@
 import { Clock } from 'lucide-react'
-import { useState } from 'react'
 
 export type ClockStyle = 'ring' | 'minimal' | 'flip'
 

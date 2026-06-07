@@ -2,11 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEME TOKENS — CSS Custom Properties
+   Applied via class on <html>: theme-focus-dark | theme-light-productivity | theme-deep-focus
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Theme 1: Focus Dark (Default) ── */
+:root,
+html.theme-focus-dark {
+  --color-bg:           #0F172A;
+  --color-surface:      #1E293B;
+  --color-surface-2:    #1A2235;
+  --color-border:       #334155;
+  --color-brand:        #38BDF8;
+  --color-brand-dark:   #0EA5E9;
+  --color-brand-light:  #E0F2FE;
+  --color-text-primary: #F1F5F9;
+  --color-text-muted:   #94A3B8;
+}
+
+/* ── Theme 2: Light Productivity ── */
+html.theme-light-productivity {
+  --color-bg:           #F8FAFC;
+  --color-surface:      #FFFFFF;
+  --color-surface-2:    #F1F5F9;
+  --color-border:       #E2E8F0;
+  --color-brand:        #3B82F6;
+  --color-brand-dark:   #2563EB;
+  --color-brand-light:  #EFF6FF;
+  --color-text-primary: #0F172A;
+  --color-text-muted:   #64748B;
+}
+
+/* ── Theme 3: Deep Focus ── */
+html.theme-deep-focus {
+  --color-bg:           #050507;
+  --color-surface:      #0D0D10;
+  --color-surface-2:    #111114;
+  --color-border:       #1C1C21;
+  --color-brand:        #38BDF8;
+  --color-brand-dark:   #0EA5E9;
+  --color-brand-light:  #082F49;
+  --color-text-primary: #E2E8F0;
+  --color-text-muted:   #475569;
+}
+
 :root {
   font-family: Inter, system-ui, sans-serif;
   color: theme('colors.text-primary');
   background-color: theme('colors.background');
 }
+
 
 * {
   box-sizing: border-box;
