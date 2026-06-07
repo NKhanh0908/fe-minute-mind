@@ -13,7 +13,10 @@ export function BackgroundPicker({ visible, currentId, onSelect, onClose }: Back
   const popoverRef = useRef<HTMLDivElement>(null)
   // Stable ref to onClose to avoid stale-closure / effect re-run issues
   const onCloseRef = useRef(onClose)
-  onCloseRef.current = onClose
+
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
 
   // Click outside → close. Only depend on `visible` to prevent listener churn.
   useEffect(() => {

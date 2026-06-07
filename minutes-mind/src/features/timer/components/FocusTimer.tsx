@@ -100,7 +100,6 @@ export function FocusTimer() {
         resetTimer()
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setMode('WORK')
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDuration(25)
       } else {
         completeModalShown.current = true
